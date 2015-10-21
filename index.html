@@ -12,6 +12,7 @@
     </style>
     <!-- script type="text/javascript" src="js/graphlet/graphlet_query.js"></script>
     <script type="text/javascript" src="js/graphlet/graphlet_procedural_run.js"></script -->
+    <script type="text/javascript" src="js/chroma.min.js"></script>
   </head>
   <body>
     <canvas id="thePatches" width="1200" height="600"></canvas>
@@ -40,7 +41,7 @@
         setPatch(mousePos.x, mousePos.y, '#FFFFFF');
       }
       else {
-        setPatch(mousePos.x, mousePos.y, '#8ED6FA');
+        setPatch(mousePos.x, mousePos.y, chroma('cornflowerblue'));
       }
     }, false);
 
