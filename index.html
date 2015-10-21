@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>fabric-patch</title>
+    <style>
+      button.running {
+        color: #FF0000;
+      }
+      button.stopped {
+        color: #000000;
+      }
+    </style>
+    <!-- script type="text/javascript" src="js/graphlet/graphlet_query.js"></script>
+    <script type="text/javascript" src="js/graphlet/graphlet_procedural_run.js"></script -->
+  </head>
+  <body>
+    <canvas id="thePatches" width="1200" height="600"></canvas>
+    <button id="toggle">pick</button>
+    <canvas id="theColors" width="1200" height="50"></canvas>
+	<div class="footer"><small>V_0.0.0.0 (got to start somewhere)</small></div>
+    <script>
+    var canvas = document.getElementById('thePatches');
+    var cx = canvas.getContext('2d');
+    cx.beginPath();
+    cx.fillStyle = "#FFFFFF";
+    cx.rect(0, 0, canvas.width, canvas.height);
+    cx.fill();
+
+    function getMousePos(canvas, evt) {
+      var rect = canvas.getBoundingClientRect();
+      return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+      };
+    }
+
+    canvas.addEventListener('click', function(evt) {
+      var mousePos = getMousePos(canvas, evt);
+      if (isSteppedOn(mousePos.x, mousePos.y)) {
+        setPatch(mousePos.x, mousePos.y, '#FFFFFF');
+      }
+      else {
+        setPatch(mousePos.x, mousePos.y, '#8ED6FA');
+      }
+    }, false);
+
+    function setPatch(x, y, color) {
+      x = Math.floor(x/100) * 100;
+      y = Math.floor(y/100) * 100;
+      cx.beginPath();
+      cx.rect(x, y, 100, 100);
+      cx.fillStyle = color;
+      cx.fill();
+    }
+      function isSteppedOn(x, y) {
+        var p = cx.getImageData(x, y, 1, 1).data;
+        if (p[0] < 255 && p[1] < 255 && p[2] < 255) {
+          return true;
+        }
+        return false;
+      }
+
+      function colorAt(x, y) {
+        var p = cx.getImageData(x, y, 1, 1).data;
+        return p;
+      }
+    </script>
+  </body>
+</html>
