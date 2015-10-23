@@ -14,15 +14,18 @@
     <script>
     var canvas = document.getElementById('thePatches');
     var cx = canvas.getContext('2d');
+    var palette = document.getElementById('theColors');
+    var px = palette.getContext('2d');
     var last_color = chroma('red');
     cx.beginPath();
     cx.fillStyle = "#FFFFFF";
     cx.rect(0, 0, canvas.width, canvas.height);
     cx.fill();
+    px.beginPath();
+    px.fillStyle = "#FFFFFF";
+    px.rect(0, 0, palette.width, palette.height);
+    px.fill();
 
-    var color_a = chroma('red');
-    var color_b = chroma('yellow');
-    var color_c = chroma('blue');
     function getMousePos(canvas, evt) {
       var rect = canvas.getBoundingClientRect();
       return {
@@ -34,21 +37,24 @@
     canvas.addEventListener('click', function(evt) {
       var mousePos = getMousePos(canvas, evt);
       var color_at;
-      if (mousePos.x < 100) { // palette
-        last_color = get_color(mousePos.x, mousePos.y);
-        return;
-      }
       color_at = get_color(mousePos.x, mousePos.y);
       setPatch(mousePos.x, mousePos.y, chroma.mix(color_at, last_color, 0.5, 'lab'));
     }, false);
 
-    function setPatch(x, y, color) {
-      x = Math.floor(x/100) * 100;
-      y = Math.floor(y/100) * 100;
-      cx.beginPath();
-      cx.rect(x, y, 100, 100);
-      cx.fillStyle = color;
-      cx.fill();
+    palette.addEventListener('click', function(evt) {
+      var mousePos = getMousePos(palette, evt);
+      last_color = get_color(mousePos.x, mousePos.y);
+    }, false);
+
+    function setPatch(x, y, color, granular, context) {
+    	var size = granular || 100;
+    	var ctx = context || cx;
+      x = Math.floor(x/size) * size;
+      y = Math.floor(y/size) * size;
+      ctx.beginPath();
+      ctx.rect(x, y, size, size);
+      ctx.fillStyle = color;
+      ctx.fill();
     }
       function isSteppedOn(x, y) {
         var p = cx.getImageData(x, y, 1, 1).data;
@@ -67,6 +73,14 @@
       function colorAt(x, y) {
         var p = cx.getImageData(x, y, 1, 1).data;
         return p;
+      }
+      function setup_palette () {
+      	var i = 0;
+      	var color_array = chroma.scale(['red', 'orange', 'yellow','green','blue', 'purple', 'red']).colors(13);
+      	for(i = 0; i < 12; i = i + 1) {
+      		setPatch(i * 10, 1, color_array[i], 10, px);
+      	}
+      	setPatch(i * 10, 1, chroma('black'), 10, px);
       }
       setPatch(10, 10 , color_a);
       setPatch(10, 110, color_b);
