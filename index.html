@@ -43,7 +43,7 @@
 
     palette.addEventListener('click', function(evt) {
       var mousePos = getMousePos(palette, evt);
-      last_color = get_color(mousePos.x, mousePos.y);
+      last_color = get_color(mousePos.x, mousePos.y, px);
     }, false);
 
     function setPatch(x, y, color, granular, context) {
@@ -63,15 +63,16 @@
         }
         return false;
       }
-      function get_color(x, y) {
-        var p = cx.getImageData(x, y, 1, 1).data;
+      function get_color(x, y, context) {
+      	var ctx = context || cx;
+        var p = colorat(x, y, ctx);
 
         var color = chroma(p, 'rgb');
         return color;
       }
 
-      function colorAt(x, y) {
-        var p = cx.getImageData(x, y, 1, 1).data;
+      function colorAt(x, y, ctx) {
+        var p = ctx.getImageData(x, y, 1, 1).data;
         return p;
       }
       function setup_palette () {
