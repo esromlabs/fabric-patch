@@ -2,14 +2,6 @@
 <html>
   <head>
     <title>fabric-patch</title>
-    <style>
-      button.running {
-        color: #FF0000;
-      }
-      button.stopped {
-        color: #000000;
-      }
-    </style>
     <!-- script type="text/javascript" src="js/graphlet/graphlet_query.js"></script>
     <script type="text/javascript" src="js/graphlet/graphlet_procedural_run.js"></script -->
     <script type="text/javascript" src="js/chroma.min.js"></script>
@@ -22,11 +14,15 @@
     <script>
     var canvas = document.getElementById('thePatches');
     var cx = canvas.getContext('2d');
+    var last_color = chroma('red');
     cx.beginPath();
     cx.fillStyle = "#FFFFFF";
     cx.rect(0, 0, canvas.width, canvas.height);
     cx.fill();
 
+    var color_a = chroma('red');
+    var color_b = chroma('yellow');
+    var color_c = chroma('blue');
     function getMousePos(canvas, evt) {
       var rect = canvas.getBoundingClientRect();
       return {
@@ -37,12 +33,13 @@
 
     canvas.addEventListener('click', function(evt) {
       var mousePos = getMousePos(canvas, evt);
-      if (isSteppedOn(mousePos.x, mousePos.y)) {
-        setPatch(mousePos.x, mousePos.y, '#FFFFFF');
+      var color_at;
+      if (mousePos.x < 100) { // palette
+        last_color = get_color(mousePos.x, mousePos.y);
+        return;
       }
-      else {
-        setPatch(mousePos.x, mousePos.y, chroma('cornflowerblue'));
-      }
+      color_at = get_color(mousePos.x, mousePos.y);
+      setPatch(mousePos.x, mousePos.y, chroma.mix(color_at, last_color, 0.5, 'lab'));
     }, false);
 
     function setPatch(x, y, color) {
@@ -60,11 +57,22 @@
         }
         return false;
       }
+      function get_color(x, y) {
+        var p = cx.getImageData(x, y, 1, 1).data;
+
+        var color = chroma(p, 'rgb');
+        return color;
+      }
 
       function colorAt(x, y) {
         var p = cx.getImageData(x, y, 1, 1).data;
         return p;
       }
+      setPatch(10, 10 , color_a);
+      setPatch(10, 110, color_b);
+      setPatch(10, 210, color_c);
+      setPatch(10, 310, chroma('black'));
+      setPatch(10, 410, chroma('white'));
     </script>
   </body>
 </html>
