@@ -8,9 +8,9 @@
   </head>
   <body>
     <canvas id="thePatches" width="1200" height="600"></canvas>
-    <button id="toggle">pick</button>
+    <!-- button id="toggle">pick</button -->
     <canvas id="theColors" width="1200" height="50"></canvas>
-	<div class="footer"><small>V_0.0.0.0 (got to start somewhere)</small></div>
+	<div class="footer"><small>V_0.0.0.1 (got to start somewhere)</small></div>
     <script>
     var canvas = document.getElementById('thePatches');
     var cx = canvas.getContext('2d');
@@ -109,12 +109,23 @@
         return p;
       }
       function setup_palette () {
-      	var i = 0;
-      	var color_array = chroma.scale(['red', 'orange', 'yellow','green','blue', 'purple', 'red']).colors(13);
-      	for(i = 0; i < 12; i = i + 1) {
-      		setPatch(i * 10, 1, color_array[i], 10, px);
+      	var i = 0, r = 0, v = 0, x_pos = 0;
+        var color_array = chroma.scale(['#FF0000', 'orange', '#FFFF00','#00FF00','#0000FF', 'purple', '#FF00FF', '#FF0000']).colors(15);
+        var value_array = chroma.scale(['#FFFFFF', '#000000']).colors(5);
+        for(v = 0; v < 5; v += 1) {
+          var val = value_array[v];
+          for(r = 0; r < 5; r += 1) {
+            x_pos = v *14;
+            for(i = 0; i < 14; i += 1) {
+      		    setPatch(x_pos * 10, r*10, chroma.mix(color_array[i], val, r/5, 'lab'), 10, px);
+              x_pos += 1;
+        	  }
+          }
       	}
-      	setPatch(i * 10, 1, chroma('black'), 10, px);
+        x_pos += 1;
+        for(r = 0; r < 5; r += 1) {
+      	  setPatch(x_pos * 10, r*10, value_array[r], 10, px);
+        }
       }
 
       setup_palette();
