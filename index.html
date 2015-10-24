@@ -17,6 +17,8 @@
     var palette = document.getElementById('theColors');
     var px = palette.getContext('2d');
     var last_color = chroma('red');
+    var last_p_pos = {x:-200, y:-200};
+    var last_p_color = null;
     cx.beginPath();
     cx.fillStyle = "#FFFFFF";
     cx.rect(0, 0, canvas.width, canvas.height);
@@ -36,9 +38,26 @@
 
     canvas.addEventListener('click', function(evt) {
       var mousePos = getMousePos(canvas, evt);
+//      var color_at = get_color(mousePos.x, mousePos.y);
+      last_p_color = chroma.mix(last_p_color, last_color, 0.5, 'lab');
+      setPatch(mousePos.x, mousePos.y, last_p_color);
+
+    }, false);
+
+    canvas.addEventListener('mousemove', function(evt) {
+      var mousePos = getMousePos(canvas, evt);
       var color_at;
-      color_at = get_color(mousePos.x, mousePos.y);
-      setPatch(mousePos.x, mousePos.y, chroma.mix(color_at, last_color, 0.5, 'lab'));
+      var p_pos = getPatchXY(mousePos.x, mousePos.y);
+      if (last_p_pos.x !== p_pos.x || last_p_pos.y !== p_pos.y) {
+        // replace the old color
+        if (last_p_color) {
+          setPatch(last_p_pos.x, last_p_pos.y, chroma(last_p_color));
+        }
+        last_p_pos = p_pos;
+        last_p_color = get_color(mousePos.x, mousePos.y);
+        color_at = get_color(mousePos.x, mousePos.y);
+        setPatch(mousePos.x, mousePos.y, chroma.mix(color_at, last_color, 0.5, 'lab'));
+      }
     }, false);
 
     palette.addEventListener('click', function(evt) {
@@ -55,6 +74,12 @@
       ctx.rect(x, y, size, size);
       ctx.fillStyle = color;
       ctx.fill();
+    }
+    function getPatchXY(x, y, granular) {
+    	var size = granular || 100;
+      x = Math.floor(x/size) * size;
+      y = Math.floor(y/size) * size;
+      return {x:x, y:y};
     }
       function isSteppedOn(x, y) {
         var p = cx.getImageData(x, y, 1, 1).data;
@@ -83,7 +108,7 @@
       	}
       	setPatch(i * 10, 1, chroma('black'), 10, px);
       }
-      
+
       setup_palette();
     </script>
   </body>
