@@ -60,6 +60,14 @@
       }
     }, false);
 
+    canvas.addEventListener('mouseout', function(evt) {
+      if (last_p_color) {
+        setPatch(last_p_pos.x, last_p_pos.y, chroma(last_p_color));
+      }
+      last_p_color = null;
+      last_p_pos = {x:-200, y:-200};
+    }, false);
+
     palette.addEventListener('click', function(evt) {
       var mousePos = getMousePos(palette, evt);
       last_color = get_color(mousePos.x, mousePos.y, px);
