@@ -4,6 +4,7 @@
     <title>fabric-patch</title>
     <!-- script type="text/javascript" src="js/graphlet/graphlet_query.js"></script>
     <script type="text/javascript" src="js/graphlet/graphlet_procedural_run.js"></script -->
+    <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
     <script type="text/javascript" src="js/chroma.min.js"></script>
   </head>
   <body>
@@ -12,6 +13,7 @@
     <canvas id="theColors" width="1200" height="50"></canvas>
 	<div class="footer"><small>V_0.0.0.1 (got to start somewhere)</small></div>
     <script>
+    var myDataRef = new Firebase('https://pefhzmvzxg7.firebaseio-demo.com/');
     var canvas = document.getElementById('thePatches');
     var cx = canvas.getContext('2d');
     var palette = document.getElementById('theColors');
@@ -41,8 +43,15 @@
 //      var color_at = get_color(mousePos.x, mousePos.y);
       last_p_color = chroma.mix(last_p_color, last_color, 0.5, 'lab');
       setPatch(mousePos.x, mousePos.y, last_p_color);
+      var hex_color = chroma(last_p_color).hex();
+      myDataRef.push([mousePos.x, mousePos.y, hex_color]);
 
     }, false);
+
+    myDataRef.on('child_added', function(snapshot) {
+      var patch = snapshot.val();
+      setPatch(patch[0], patch[1], chroma(patch[2]));
+    });
 
     canvas.addEventListener('mousemove', function(evt) {
       var mousePos = getMousePos(canvas, evt);
