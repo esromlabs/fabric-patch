@@ -5,7 +5,7 @@
     <style media="screen">
     canvas{
       position:absolute;
-      top:10px;
+      top:40px;
       left:10px;
     }
     </style>
@@ -15,6 +15,7 @@
     <script type="text/javascript" src="js/chroma.min.js"></script>
   </head>
   <body>
+    <p id="gesture_out">...</p>
     <canvas id="thePatches" width="1200" height="600"></canvas>
     <!-- button id="toggle">pick</button -->
     <canvas id="theColors" width="1200" height="600"></canvas>
@@ -28,7 +29,13 @@
     var last_color = chroma('red');
     var last_p_pos = {x:-200, y:-200};
     var last_p_color = null;
-    var gesture = 'hover';
+    var set_gesture = function(mode) {
+      var gesture_out = document.getElementById('gesture_out');
+      gesture_out.innerHTML = mode;
+      gesture = mode;
+    };
+    var gesture;
+    set_gesture('hover');
 
     cx.beginPath();
     cx.fillStyle = "#FFFFFF";
@@ -79,6 +86,7 @@
         }
       }
       else {
+        set_gesture('palette_mode');
         setup_palette();
       }
     }, false);
@@ -92,10 +100,11 @@
     }, false);
 
     palette.addEventListener('mousedown', function(evt) {
-      gesture = 'palette_mode';
+      first_palette_pos = getMousePos(palette, evt);
+      set_gesture('down');
     }, false);
     palette.addEventListener('mouseup', function(evt) {
-      if (gesture == 'hover') {
+      if (gesture === 'down') {
         paint_patch(evt);
       }
       else {
@@ -103,8 +112,13 @@
         last_color = get_color(mousePos.x, mousePos.y, px);
       }
       clear_palette();
-      gesture = 'hover';
+      set_gesture('hover');
     }, false);
+    // palette.addEventListener('click', function(evt) {
+    //   paint_patch(evt);
+    //   clear_palette();
+    //   set_gesture('hover');
+    // }, false);
 
     // palette.addEventListener('click', function(evt) {
     //   var mousePos = getMousePos(palette, evt);
