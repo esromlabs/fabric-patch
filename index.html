@@ -2,6 +2,13 @@
 <html>
   <head>
     <title>fabric-patch</title>
+    <style media="screen">
+    canvas{
+      position:absolute;
+      top:10px;
+      left:10px;
+    }
+    </style>
     <!-- script type="text/javascript" src="js/graphlet/graphlet_query.js"></script>
     <script type="text/javascript" src="js/graphlet/graphlet_procedural_run.js"></script -->
     <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
@@ -10,7 +17,7 @@
   <body>
     <canvas id="thePatches" width="1200" height="600"></canvas>
     <!-- button id="toggle">pick</button -->
-    <canvas id="theColors" width="1200" height="50"></canvas>
+    <canvas id="theColors" width="1200" height="600"></canvas>
 	<div class="footer"><small>V_0.0.0.1 (got to start somewhere)</small></div>
     <script>
     var myDataRef = new Firebase('https://pefhzmvzxg7.firebaseio-demo.com/');
@@ -21,14 +28,16 @@
     var last_color = chroma('red');
     var last_p_pos = {x:-200, y:-200};
     var last_p_color = null;
+    var gesture = 'hover';
+
     cx.beginPath();
     cx.fillStyle = "#FFFFFF";
     cx.rect(0, 0, canvas.width, canvas.height);
     cx.fill();
-    px.beginPath();
-    px.fillStyle = "#FFFFFF";
-    px.rect(0, 0, palette.width, palette.height);
-    px.fill();
+    // px.beginPath();
+    // px.fillStyle = "#FFFFFF";
+    // px.rect(0, 0, palette.width, palette.height);
+    // px.fill();
 
     function getMousePos(canvas, evt) {
       var rect = canvas.getBoundingClientRect();
@@ -38,38 +47,43 @@
       };
     }
 
-    canvas.addEventListener('click', function(evt) {
-      var mousePos = getMousePos(canvas, evt);
+    function paint_patch(evt) {
+      var mousePos = getMousePos(palette, evt);
 //      var color_at = get_color(mousePos.x, mousePos.y);
       last_p_color = chroma.mix(last_p_color, last_color, 0.5, 'lab');
       setPatch(mousePos.x, mousePos.y, last_p_color);
       var hex_color = chroma(last_p_color).hex();
       myDataRef.push([mousePos.x, mousePos.y, hex_color]);
 
-    }, false);
+    }
 
     myDataRef.on('child_added', function(snapshot) {
       var patch = snapshot.val();
       setPatch(patch[0], patch[1], chroma(patch[2]));
     });
 
-    canvas.addEventListener('mousemove', function(evt) {
-      var mousePos = getMousePos(canvas, evt);
+    palette.addEventListener('mousemove', function(evt) {
+      var mousePos = getMousePos(palette, evt);
       var color_at;
       var p_pos = getPatchXY(mousePos.x, mousePos.y);
-      if (last_p_pos.x !== p_pos.x || last_p_pos.y !== p_pos.y) {
-        // replace the old color
-        if (last_p_color) {
-          setPatch(last_p_pos.x, last_p_pos.y, chroma(last_p_color));
+      if (gesture === 'hover') {
+        if (last_p_pos.x !== p_pos.x || last_p_pos.y !== p_pos.y) {
+          // replace the old color
+          if (last_p_color) {
+            setPatch(last_p_pos.x, last_p_pos.y, chroma(last_p_color));
+          }
+          last_p_pos = p_pos;
+          last_p_color = get_color(mousePos.x, mousePos.y);
+          color_at = get_color(mousePos.x, mousePos.y);
+          setPatch(mousePos.x, mousePos.y, chroma.mix(color_at, last_color, 0.5, 'lab'));
         }
-        last_p_pos = p_pos;
-        last_p_color = get_color(mousePos.x, mousePos.y);
-        color_at = get_color(mousePos.x, mousePos.y);
-        setPatch(mousePos.x, mousePos.y, chroma.mix(color_at, last_color, 0.5, 'lab'));
+      }
+      else {
+        setup_palette();
       }
     }, false);
 
-    canvas.addEventListener('mouseout', function(evt) {
+    palette.addEventListener('mouseout', function(evt) {
       if (last_p_color) {
         setPatch(last_p_pos.x, last_p_pos.y, chroma(last_p_color));
       }
@@ -77,10 +91,25 @@
       last_p_pos = {x:-200, y:-200};
     }, false);
 
-    palette.addEventListener('click', function(evt) {
-      var mousePos = getMousePos(palette, evt);
-      last_color = get_color(mousePos.x, mousePos.y, px);
+    palette.addEventListener('mousedown', function(evt) {
+      gesture = 'palette_mode';
     }, false);
+    palette.addEventListener('mouseup', function(evt) {
+      if (gesture == 'hover') {
+        paint_patch(evt);
+      }
+      else {
+        var mousePos = getMousePos(palette, evt);
+        last_color = get_color(mousePos.x, mousePos.y, px);
+      }
+      clear_palette();
+      gesture = 'hover';
+    }, false);
+
+    // palette.addEventListener('click', function(evt) {
+    //   var mousePos = getMousePos(palette, evt);
+    //   last_color = get_color(mousePos.x, mousePos.y, px);
+    // }, false);
 
     function setPatch(x, y, color, granular, context) {
     	var size = granular || 100;
@@ -136,8 +165,11 @@
       	  setPatch(x_pos * 10, r*10, value_array[r], 10, px);
         }
       }
+      function clear_palette() {
+        px.clearRect(0, 0, palette.width, palette.height);
+      }
 
-      setup_palette();
+      // setup_palette();
     </script>
   </body>
 </html>
