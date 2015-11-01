@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>fabric-patch</title>
+    <style media="screen">
+    canvas{
+      position:absolute;
+      top:40px;
+      left:10px;
+    }
+    </style>
+    <!-- script type="text/javascript" src="js/graphlet/graphlet_query.js"></script>
+    <script type="text/javascript" src="js/graphlet/graphlet_procedural_run.js"></script -->
+    <!-- // <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script> -->
+    <script type="text/javascript" src="js/chroma.min.js"></script>
+    <script type="text/javascript" src="js/fab-patch.js"></script>
+  </head>
+  <body>
+    <p id="gesture_out">...</p>
+    <canvas id="thePatches" width="1200" height="600"></canvas>
+    <!-- button id="toggle">pick</button -->
+    <canvas id="theColors" width="1200" height="600"></canvas>
+	<div class="footer"><small>V_0.0.0.1 (got to start somewhere)</small></div>
+    <script>
+    // var myDataRef = new Firebase('https://pefhzmvzxg7.firebaseio-demo.com/');
+    // var canvas = document.getElementById('thePatches');
+    // var cx = canvas.getContext('2d');
+    var palette = new Palette('theColors');
+    </script>
+  </body>
+</html>
