@@ -22,23 +22,24 @@ var Gesture = (function () {
             }
         }
         else if (event.type === 'mousemove') {
-            if (this.current_state === 'down') {
+            if (this.current_state === 'down' || this.current_state === 'palette_mode') {
                 var cp = this.getMousePos(event);
                 var wp = this.wander_origin;
-                this.wander_dir = '';
+                var compass_dir = '';
                 if (cp.y < wp.y) {
-                    this.wander_dir += 'N';
+                    compass_dir += 'N';
                 }
                 if (cp.y > wp.y) {
-                    this.wander_dir += 'S';
+                    compass_dir += 'S';
                 }
                 if (cp.x < wp.x) {
-                    this.wander_dir += 'W';
+                    compass_dir += 'W';
                 }
                 if (cp.x > wp.x) {
-                    this.wander_dir += 'E';
+                    compass_dir += 'E';
                 }
-                if (this.wander_dir.length === 2) {
+                if (compass_dir.length === 2 && compass_dir !== this.wander_dir) {
+                    this.wander_dir = compass_dir;
                     this.set('palette_mode');
                 }
             }
